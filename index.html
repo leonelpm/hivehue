@@ -157,9 +157,10 @@
   footer{border-top:3px solid var(--ink);padding:24px 0 40px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;color:#555}
 
   @media(max-width:760px){
-    .lb-panel{grid-template-columns:1fr;max-height:92vh}
+    .lb-panel{grid-template-columns:1fr;max-height:92vh;overflow-y:auto}
     .lb-img{border-right:none;border-bottom:3px solid var(--ink);padding:16px}
     .lb-img img{max-height:42vh}
+    .lb-info{overflow-y:visible}
     .two-col{grid-template-columns:1fr;gap:24px}
     .lb{padding:14px}
   }
