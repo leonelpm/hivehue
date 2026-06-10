@@ -311,7 +311,7 @@
       </div>
       <div class="ctrl">
         <label for="size">Size <span id="vSize">52</span></label>
-        <input type="range" id="size" min="28" max="128" value="52">
+        <input type="range" id="size" min="28" max="128" value="108">
       </div>
     </div>
 
@@ -362,8 +362,8 @@ const C = {
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 /* ---------- animation engine: targets lerp toward state ---------- */
-const state  = { vpx:.5, vpy:.5, offset:22, size:52, angle:0, guideA:0 };
-const target = { vpx:.5, vpy:.5, offset:22, size:52, angle:0, guideA:0 };
+const state  = { vpx:.5, vpy:.43, offset:22, size:108, angle:0, guideA:0 };
+const target = { vpx:.5, vpy:.43, offset:22, size:108, angle:0, guideA:0 };
 let rafId = null;
 let dragging = false;
 
@@ -626,10 +626,10 @@ C.square.addEventListener('input',requestDraw);
 
 document.getElementById('reset').addEventListener('click',()=>{
   palette=DEFAULT_PALETTE.slice();
-  C.offset.value=22;C.layers.value=4;C.angle.value=0;C.size.value=52;
+  C.offset.value=22;C.layers.value=4;C.angle.value=0;C.size.value=108;
   C.multiply.checked=true;C.gray.checked=false;C.square.checked=false;C.alternate.checked=true;
   C.guides.checked=false;
-  Object.assign(target,{vpx:.5,vpy:.5,offset:22,size:52,angle:0,guideA:0});
+  Object.assign(target,{vpx:.5,vpy:.43,offset:22,size:108,angle:0,guideA:0});
   clearTimeout(conceptTimer);
   for(const k in conceptEls) conceptEls[k].classList.remove('active');
   buildSwatches(); syncLabels(); requestDraw();
