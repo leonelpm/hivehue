@@ -225,12 +225,43 @@
     color:#8a7a82;
   }
 
+  .return-link{
+    position:fixed;
+    top:clamp(12px,2.5vw,22px);
+    left:clamp(12px,2.5vw,22px);
+    z-index:10;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-family:'Archivo Black',sans-serif;
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    text-decoration:none;
+    color:#fff;
+    background:var(--ink);
+    border:1.5px solid var(--ink);
+    padding:9px 13px;
+    box-shadow:4px 4px 0 var(--accent);
+    transition:background .15s, transform .15s, box-shadow .15s;
+  }
+  .return-link:hover{
+    background:var(--accent);
+    transform:translate(-1px,-1px);
+    box-shadow:5px 5px 0 var(--ink);
+  }
+  .return-link:focus-visible{
+    outline:3px solid var(--accent);
+    outline-offset:3px;
+  }
+  
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important;animation:none !important;}
   }
 </style>
 </head>
 <body>
+  <a class="return-link" href="https://hivehue.art">← Return to HiveHue</a>
 <div class="wrap">
   <div>
     <div class="stage-card">
