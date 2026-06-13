@@ -485,7 +485,6 @@ function draw(){
   ctx.fillStyle='#ffffff';
   ctx.fillRect(0,0,W,H);
 
-  const cols=5, rows=5;
   const layers=+C.layers.value;
   const useGray=C.gray.checked;
   const square=C.square.checked;
@@ -497,11 +496,21 @@ function draw(){
   const twist=state.angle*Math.PI/180;
   const vpX=state.vpx*W, vpY=state.vpy*H;
 
-  const marginX=W*0.13;
-  const side=W-2*marginX;
-  const topMargin=H*0.13;
-  const cell=side/(cols-1);
-  const maxDist=Math.hypot(side,side)*0.78; // depth-scale normalizer
+  // cluster centers: a big circular arrangement around the composition center.
+  // 1 center set + 8 inner-ring sets + 16 outer-ring sets = 25 total.
+  const compX=W*0.5, compY=H*0.5;
+  const outerR=W*0.37;
+  const innerR=W*0.205;
+  const centers=[{x:compX, y:compY}];
+  for(let i=0;i<8;i++){
+    const a=i/8*Math.PI*2 - Math.PI/2;
+    centers.push({x:compX+Math.cos(a)*innerR, y:compY+Math.sin(a)*innerR});
+  }
+  for(let i=0;i<16;i++){
+    const a=i/16*Math.PI*2 - Math.PI/2;
+    centers.push({x:compX+Math.cos(a)*outerR, y:compY+Math.sin(a)*outerR});
+  }
+  const maxDist=Math.hypot(W,H)*0.58; // depth-scale normalizer
   const ca=Math.cos(twist), sa=Math.sin(twist);
 
   /* guide lines: each cluster center -> vanishing point (drawn beneath the forms) */
@@ -510,21 +519,18 @@ function draw(){
     ctx.strokeStyle=`rgba(26,16,20,${0.20*state.guideA})`;
     ctx.lineWidth=1;
     ctx.beginPath();
-    for(let row=0;row<rows;row++){
-      for(let col=0;col<cols;col++){
-        ctx.moveTo(marginX+col*cell, topMargin+row*cell);
-        ctx.lineTo(vpX,vpY);
-      }
+    for(const c of centers){
+      ctx.moveTo(c.x, c.y);
+      ctx.lineTo(vpX,vpY);
     }
     ctx.stroke();
   }
 
   ctx.globalCompositeOperation = C.multiply.checked ? 'multiply' : 'source-over';
 
-  for(let row=0;row<rows;row++){
-    for(let col=0;col<cols;col++){
-      const cx=marginX+col*cell;
-      const cy=topMargin+row*cell;
+  for(const c of centers){
+      const cx=c.x;
+      const cy=c.y;
 
       // direction toward the vanishing point
       let vx=vpX-cx, vy=vpY-cy;
@@ -552,7 +558,6 @@ function draw(){
         else       ctx.arc(px,py,r,0,Math.PI*2);
         ctx.fill();
       }
-    }
   }
 
   /* vanishing point marker (always source-over, on top) */
