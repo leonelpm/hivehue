@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLICE · What a Higher Dimension Looks Like Passing Through</title>
+<meta name="og:title" content="SLICE · An Interactive Study of the Fourth Dimension">
+<meta name="og:description" content="You cannot see a higher dimension. You can see its cross-section. An interactive study from HiveHue, after Rudy Rucker's dimensional analogy.">
+<style>
+  :root{
+    --ink:#0d1b3e;        /* deep space blue — ground */
+    --paper:#f3ede1;      /* warm WPA paper */
+    --red:#e23b32;        /* vermilion */
+    --orange:#f08a24;     /* signal orange */
+    --yellow:#f4c542;     /* sodium yellow */
+    --cyan:#3aa0c4;       /* recede cool */
+    --line:rgba(243,237,225,.22);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--yellow);text-decoration:none}
+  .wrap{max-width:1600px;margin:0 auto;padding:18px 26px 24px}
+
+  /* ---- masthead ---- */
+  .top{display:flex;justify-content:space-between;align-items:baseline;
+       border-bottom:2px solid var(--paper);padding-bottom:8px;margin-bottom:14px}
+  .mark{font-weight:800;letter-spacing:.32em;font-size:12px}
+  .back{font-size:11px;letter-spacing:.14em;opacity:.8}
+  /* hero made horizontal: title left, blurb right — saves vertical space */
+  .hero{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:clamp(40px,6vw,72px);font-weight:800;letter-spacing:-.02em;
+     line-height:1.05;margin:0}
+  .herotext{flex:1;min-width:280px}
+  .sub{font-size:clamp(13px,1.5vw,16px);max-width:70ch;opacity:.92;
+       border-left:3px solid var(--orange);padding-left:13px;margin:0}
+  .src{font-size:11px;letter-spacing:.12em;opacity:.55;margin-top:6px;
+       text-transform:uppercase}
+
+  /* ---- the three panels, one row ---- */
+  .panels{margin-top:14px;display:grid;gap:14px;grid-template-columns:1fr}
+  .panel{border:1px solid var(--line);position:relative;background:#0a1530}
+  .phead{display:flex;justify-content:space-between;align-items:center;
+         padding:8px 13px;border-bottom:1px solid var(--line);
+         font-size:10px;letter-spacing:.12em;text-transform:uppercase;gap:8px}
+  .pnum{font-weight:800;color:var(--ink);background:var(--yellow);
+        padding:2px 7px;font-size:11px;letter-spacing:.06em}
+  .ptag{opacity:.7;text-align:right}
+  canvas{display:block;width:100%;height:auto;touch-action:none}
+  .pfoot{padding:8px 13px;font-size:11px;border-top:1px solid var(--line);
+         display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .pfoot b{color:var(--yellow);font-weight:700}
+  .pfoot .what{opacity:.7;line-height:1.35}
+  .seen{font-family:"SFMono-Regular",Menlo,Consolas,monospace;
+        font-size:10.5px;letter-spacing:.04em;color:var(--orange);white-space:nowrap}
+
+  /* ---- the single control ---- */
+  .console{margin-top:14px;border:1px solid var(--line);padding:13px 16px;background:#0a1530}
+  .clabel{display:flex;justify-content:space-between;align-items:baseline;
+          font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+  .clabel .val{font-family:"SFMono-Regular",Menlo,Consolas,monospace;
+               color:var(--yellow);letter-spacing:.04em}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;
+    background:var(--line);outline:none;margin:10px 0 8px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:24px;height:24px;border-radius:50%;background:var(--red);
+    border:3px solid var(--paper);cursor:grab}
+  input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;background:var(--orange)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;
+    background:var(--red);border:3px solid var(--paper);cursor:grab}
+  .scale{display:flex;justify-content:space-between;font-size:10px;
+         letter-spacing:.1em;opacity:.5;text-transform:uppercase}
+  .crow{display:flex;justify-content:space-between;align-items:center;gap:18px;
+        margin-top:10px;flex-wrap:wrap}
+  .hint{font-size:12px;opacity:.7;max-width:78ch;margin:0;flex:1;min-width:260px}
+  .toggles{display:flex;flex-wrap:wrap;gap:8px}
+  .tg{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+      border:1px solid var(--line);padding:7px 12px;cursor:pointer;
+      background:transparent;color:var(--paper);transition:.15s}
+  .tg.on{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+  .tg:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+
+  .note{margin-top:14px;font-size:12.5px;opacity:.8;max-width:none}
+  .note b{color:var(--yellow)}
+  .foot{margin-top:14px;padding-top:10px;border-top:1px solid var(--line);
+        font-size:10px;letter-spacing:.1em;opacity:.5;text-transform:uppercase}
+
+  @media (min-width:900px){
+    .panels{grid-template-columns:1fr 1fr 1fr}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="mark">HIVEHUE</span>
+    <a class="back" href="https://hivehue.art">← RETURN TO HIVEHUE</a>
+  </div>
+
+  <div class="hero">
+    <h1>4D SLICE</h1>
+    <div class="herotext">
+      <p class="sub">You cannot picture a higher dimension. You can watch its <em>cross&#8209;section</em> pass through yours. Drag the control — all three worlds are pierced at once.</p>
+      <p class="src">After Rudy Rucker · <i>Geometry, Relativity and the Fourth Dimension</i> · the analogy of A. Square</p>
+    </div>
+  </div>
+
+  <div class="panels">
+    <!-- FLATLAND -->
+    <section class="panel">
+      <div class="phead"><span class="pnum">01</span><span class="ptag">Flatland · cube crosses a plane</span></div>
+      <canvas id="c2d" width="760" height="600"></canvas>
+      <div class="pfoot">
+        <span class="what">A. Square sees a polygon appear, swell, and vanish.</span>
+        <span class="seen" id="seen2d">edges: —</span>
+      </div>
+    </section>
+
+    <!-- YOUR SPACE -->
+    <section class="panel">
+      <div class="phead"><span class="pnum">02</span><span class="ptag">Your space · the slice as you'd see it</span></div>
+      <canvas id="c3d" width="760" height="600"></canvas>
+      <div class="pfoot">
+        <span class="what">You see a polyhedron appear, swell, and vanish.</span>
+        <span class="seen" id="seen3d">faces: —</span>
+      </div>
+    </section>
+
+    <!-- THE WHOLE TESSERACT + its solid slice -->
+    <section class="panel">
+      <div class="phead"><span class="pnum">03</span><span class="ptag">The whole tesseract, in 4-D at <span id="wcut4d">w = —</span></span></div>
+      <canvas id="c4d" width="760" height="600"></canvas>
+      <div class="pfoot">
+        <span class="what">4-D object and its cross-section.</span>
+        <span class="seen" id="seen4d">—</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- THE ONE CONTROL -->
+
+  <div class="console">
+    <div class="clabel"><span>The crossing — depth along the unseen axis</span><span class="val" id="wval">w = 0.00</span></div>
+    <input id="slider" type="range" min="-100" max="100" value="-100" step="1" aria-label="Position of the higher object crossing your space">
+    <div class="scale"><span>before</span><span>entering</span><span>full section</span><span>leaving</span><span>after</span></div>
+    <div class="crow">
+      <p class="hint">One gesture drives all three. The slider is the position of an object from the next dimension up, sliding through the world below it. What you keep is only the slice that touches your space — never the whole shape.</p>
+      <div class="toggles">
+        <button class="tg on" id="tEdges">Trace edges</button>
+        <button class="tg" id="tGhost">Ghost shape</button>
+        <button class="tg" id="tSweep">Auto&#8209;sweep</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">Rucker's point, in one move: a being one dimension below you could never <b>see</b> your body — only the cross-sections that pass through their world as you push through it. The tesseract in panel 03 is doing to <em>you</em> exactly what the cube in panel 01 does to A. Square. The slice is all either of you ever gets.</p>
+
+  <div class="foot">Interactive study · cross-section &amp; dimensional analogy · single-file HTML · HiveHue · Leonel Palacios</div>
+</div>
+
+<script>
+(()=>{
+"use strict";
+const PAPER="#f3ede1", RED="#e23b32", ORANGE="#f08a24", YELLOW="#f4c542", CYAN="#3aa0c4", INK="#0d1b3e";
+const reduce = matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+const slider=document.getElementById("slider");
+const wval=document.getElementById("wval");
+const seen2d=document.getElementById("seen2d");
+const seen3d=document.getElementById("seen3d");
+let traceEdges=true, ghost=false, sweep=false;
+
+/* ---------------- PANEL 01 : a 3-D cube crossing the 2-D plane ----------------
+   A unit cube tilted so no face is parallel to the plane. The plane is z = w.
+   The cross-section is the polygon where cube edges pierce z=w.            */
+function makeCube(){
+  const v=[];
+  for(let x=-1;x<=1;x+=2)for(let y=-1;y<=1;y+=2)for(let z=-1;z<=1;z+=2)v.push([x,y,z]);
+  const E=[]; // edges: pairs differing in exactly one coordinate
+  for(let i=0;i<8;i++)for(let j=i+1;j<8;j++){
+    let d=0;for(let k=0;k<3;k++)if(v[i][k]!==v[j][k])d++;
+    if(d===1)E.push([i,j]);
+  }
+  return {v,E};
+}
+const CUBE=makeCube();
+// tilt the cube with a fixed rotation so the slice is a non-trivial polygon
+function rot3(p,ax,ay){
+  let [x,y,z]=p;
+  let c=Math.cos(ax),s=Math.sin(ax); [y,z]=[y*c-z*s,y*s+z*c];
+  c=Math.cos(ay);s=Math.sin(ay); [x,z]=[x*c+z*s,-x*s+z*c];
+  return [x,y,z];
+}
+const TILT=[0.62,0.46];
+const cubeV=CUBE.v.map(p=>rot3(p,TILT[0],TILT[1]));
+
+function sliceCube(w){ // intersect tilted cube edges with plane z=w -> 2-D pts
+  const pts=[];
+  for(const [a,b] of CUBE.E){
+    const A=cubeV[a],B=cubeV[b];
+    const za=A[2],zb=B[2];
+    if((za-w)*(zb-w)<0){
+      const t=(w-za)/(zb-za);
+      pts.push([A[0]+t*(B[0]-A[0]), A[1]+t*(B[1]-A[1])]);
+    }
+  }
+  // order by angle to form a convex-ish polygon
+  if(pts.length>2){
+    let cx=0,cy=0;pts.forEach(p=>{cx+=p[0];cy+=p[1]});cx/=pts.length;cy/=pts.length;
+    pts.sort((p,q)=>Math.atan2(p[1]-cy,p[0]-cx)-Math.atan2(q[1]-cy,q[0]-cx));
+  }
+  return pts;
+}
+
+const c2=document.getElementById("c2d"), x2=c2.getContext("2d");
+function draw2d(w){
+  const W=c2.width,H=c2.height,cx=W/2,cy=H/2,S=H*0.30;
+  x2.clearRect(0,0,W,H);
+  // the plane (Flatland) — a horizon line + grid, dead flat
+  x2.strokeStyle="rgba(243,237,225,.14)";x2.lineWidth=1;
+  for(let i=-4;i<=4;i++){
+    x2.beginPath();x2.moveTo(cx+i*S*0.5,cy-S*1.4);x2.lineTo(cx+i*S*0.5,cy+S*1.4);x2.stroke();
+    x2.beginPath();x2.moveTo(cx-S*1.7,cy+i*S*0.4);x2.lineTo(cx+S*1.7,cy+i*S*0.4);x2.stroke();
+  }
+  // ghost: faint full cube as orthographic shadow
+  if(ghost){
+    x2.strokeStyle="rgba(58,160,196,.32)";x2.lineWidth=1.2;
+    for(const [a,b] of CUBE.E){
+      const A=cubeV[a],B=cubeV[b];
+      x2.beginPath();
+      x2.moveTo(cx+A[0]*S,cy+A[1]*S);
+      x2.lineTo(cx+B[0]*S,cy+B[1]*S);
+      x2.stroke();
+    }
+  }
+  const pts=sliceCube(w);
+  seen2d.textContent = pts.length ? "edges: "+pts.length : "edges: 0 (no slice)";
+  if(pts.length>=2){
+    // filled polygon = what A. Square actually sees
+    x2.beginPath();
+    pts.forEach((p,i)=>{const X=cx+p[0]*S,Y=cy+p[1]*S; i?x2.lineTo(X,Y):x2.moveTo(X,Y);});
+    x2.closePath();
+    x2.fillStyle="rgba(226,59,50,.85)";x2.fill();
+    if(traceEdges){x2.strokeStyle=YELLOW;x2.lineWidth=2.4;x2.stroke();}
+    // vertices
+    x2.fillStyle=PAPER;
+    pts.forEach(p=>{x2.beginPath();x2.arc(cx+p[0]*S,cy+p[1]*S,3,0,7);x2.fill();});
+  }
+}
+
+/* ---------------- PANEL 02 : a 4-D tesseract crossing the 3-D world ----------------
+   16 vertices in {-1,1}^4, tilted in 4-D. Plane is w = slider.
+   The cross-section is a 3-D polyhedron; we project it to 2-D for display. */
+function makeTess(){
+  const v=[];
+  for(let x=-1;x<=1;x+=2)for(let y=-1;y<=1;y+=2)for(let z=-1;z<=1;z+=2)for(let t=-1;t<=1;t+=2)v.push([x,y,z,t]);
+  const E=[];
+  for(let i=0;i<16;i++)for(let j=i+1;j<16;j++){
+    let d=0;for(let k=0;k<4;k++)if(v[i][k]!==v[j][k])d++;
+    if(d===1)E.push([i,j]);
+  }
+  return {v,E};
+}
+const TESS=makeTess();
+function rot4(p,a,b,ang){const q=p.slice();const c=Math.cos(ang),s=Math.sin(ang);
+  q[a]=p[a]*c-p[b]*s;q[b]=p[a]*s+p[b]*c;return q;}
+// The tesseract's current 4-D pose. BOTH panel 02 and cell 03 slice THIS same
+// rotated object at the same instant, so they always show the same solid.
+let spin4=0; // 4-D rotation angle (xw / zw planes) — shared by panel 02 and cell 03
+function tessNow(){
+  return TESS.v.map(p=>{
+    let q=rot4(p,0,3,spin4);        // x-w  (the live 4-D rotation)
+    q=rot4(q,2,3,spin4*0.6);        // z-w
+    q=rot4(q,0,2,0.5);              // fixed 3-D tilt for a readable pose
+    q=rot4(q,1,2,0.3);
+    return q;
+  });
+}
+
+function sliceTess(w){ // intersect the live tesseract's edges with hyperplane w=const -> 3-D pts
+  const Vn=tessNow();
+  const pts=[];
+  for(const [a,b] of TESS.E){
+    const A=Vn[a],B=Vn[b];
+    const wa=A[3],wb=B[3];
+    if((wa-w)*(wb-w)<0){
+      const t=(w-wa)/(wb-wa);
+      pts.push([A[0]+t*(B[0]-A[0]),A[1]+t*(B[1]-A[1]),A[2]+t*(B[2]-A[2])]);
+    }
+  }
+  return pts;
+}
+// convex hull -> grouped planar faces (clean polyhedron, not a triangle soup)
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const norm=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];};
+function hullFaces(P){
+  const n=P.length; if(n<4) return [];
+  // centroid, used to orient every face outward
+  const C=[0,0,0]; P.forEach(p=>{C[0]+=p[0];C[1]+=p[1];C[2]+=p[2];});
+  C[0]/=n;C[1]/=n;C[2]/=n;
+  const planes=[]; // {nrm, off, idx:[...]}
+  for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)for(let k=j+1;k<n;k++){
+    let nrm=cross(sub(P[j],P[i]),sub(P[k],P[i]));
+    if(Math.abs(nrm[0])+Math.abs(nrm[1])+Math.abs(nrm[2])<1e-7) continue;
+    nrm=norm(nrm);
+    const off=dot(nrm,P[i]);
+    let pos=false,neg=false;
+    for(let m=0;m<n;m++){const d=dot(nrm,P[m])-off;
+      if(d>1e-5)pos=true; if(d<-1e-5)neg=true;}
+    if(pos&&neg) continue;                // not a hull face
+    // orient outward
+    if(dot(nrm,sub(P[i],C))<0){nrm=[-nrm[0],-nrm[1],-nrm[2]];}
+    // merge into an existing coplanar face if present
+    let found=null;
+    for(const pl of planes){
+      if(Math.abs(dot(pl.nrm,nrm)-1)<1e-4 && Math.abs(pl.off-dot(nrm,P[i]))<1e-4){found=pl;break;}
+    }
+    const off2=dot(nrm,P[i]);
+    if(!found){found={nrm,off:off2,idx:new Set()};planes.push(found);}
+    found.idx.add(i);found.idx.add(j);found.idx.add(k);
+  }
+  // turn each plane into an ordered polygon
+  return planes.map(pl=>{
+    const ids=[...pl.idx];
+    const c=[0,0,0];ids.forEach(id=>{c[0]+=P[id][0];c[1]+=P[id][1];c[2]+=P[id][2];});
+    c[0]/=ids.length;c[1]/=ids.length;c[2]/=ids.length;
+    // build 2-D basis on the plane to sort by angle
+    let u=norm(sub(P[ids[0]],c)); let v=cross(pl.nrm,u);
+    ids.sort((a,b)=>{
+      const da=sub(P[a],c),db=sub(P[b],c);
+      return Math.atan2(dot(da,v),dot(da,u))-Math.atan2(dot(db,v),dot(db,u));
+    });
+    return {ids,nrm:pl.nrm};
+  });
+}
+let spinA=0.4; // live rotation of the section solid (radians), drives legibility
+function spinPt(p){ // rotate a 3-D section point around Y, then a touch around X
+  let [x,y,z]=p;
+  const cy=Math.cos(spinA),sy=Math.sin(spinA);
+  [x,z]=[x*cy+z*sy,-x*sy+z*cy];
+  const cx2=Math.cos(0.28),sx2=Math.sin(0.28);
+  [y,z]=[y*cx2-z*sx2,y*sx2+z*cx2];
+  return [x,y,z];
+}
+function proj3(p){ // simple perspective from +z
+  const k=2.6/(2.6 - p[2]*0.45);
+  return [p[0]*k,p[1]*k,p[2]];
+}
+// name the section polyhedron from its (faces, verts) signature
+function namePoly(nf,nv){
+  if(nv<4) return "—";
+  if(nf===4&&nv===4) return "tetrahedron";
+  if(nf===6&&nv===8) return "cube";
+  if(nf===8&&nv===6) return "octahedron";
+  if(nf===6&&nv===6) return "triangular prism";
+  if(nf===5&&nv===6) return "triangular prism";
+  if(nf===5&&nv===5) return "square pyramid";
+  if(nf===8&&nv===12) return "truncated solid";
+  if(nf===6&&nv===12) return "hexagonal section";
+  return nf+"-faced solid";
+}
+
+const c3=document.getElementById("c3d"), x3=c3.getContext("2d");
+function draw3d(w){
+  const W=c3.width,H=c3.height,cx=W/2,cy=H/2,S=H*0.26;
+  x3.clearRect(0,0,W,H);
+  // your space: a perspective floor grid so it reads as 3-D
+  x3.strokeStyle="rgba(243,237,225,.10)";x3.lineWidth=1;
+  for(let i=-5;i<=5;i++){
+    const t=i/5;
+    x3.beginPath();
+    x3.moveTo(cx + t*S*2.2, cy - S*1.5);
+    x3.lineTo(cx + t*S*3.2, cy + S*1.5);
+    x3.stroke();
+  }
+  for(let j=0;j<=6;j++){
+    const yy=cy - S*1.4 + j*(S*2.8/6);
+    const spread = 2.2 + (yy-(cy-S*1.4))/(S*2.8)*1.0;
+    x3.beginPath();x3.moveTo(cx-S*spread,yy);x3.lineTo(cx+S*spread,yy);x3.stroke();
+  }
+
+  const P=sliceTess(w);
+  if(ghost){
+    const Vn=tessNow();
+    x3.strokeStyle="rgba(58,160,196,.30)";x3.lineWidth=1;
+    for(const [a,b] of TESS.E){
+      const A=proj3(spinPt(Vn[a])),B=proj3(spinPt(Vn[b]));
+      x3.beginPath();x3.moveTo(cx+A[0]*S,cy-A[1]*S);x3.lineTo(cx+B[0]*S,cy-B[1]*S);x3.stroke();
+    }
+  }
+  if(P.length<3){seen3d.textContent="—";return;}
+  const faces=hullFaces(P);
+  seen3d.textContent=namePoly(faces.length,P.length)+" · "+faces.length+"f "+P.length+"v";
+  // rotate section points into view, then sort faces back-to-front
+  const PR=P.map(spinPt);
+  const fz=f=>{let z=0;f.ids.forEach(id=>z+=PR[id][2]);return z/f.ids.length;};
+  const order=faces.slice().sort((a,b)=>fz(a)-fz(b));
+  const pal=[RED,ORANGE,YELLOW,CYAN];
+  order.forEach((f,oi)=>{
+    // recompute facing from rotated geometry for correct shading
+    const a=PR[f.ids[0]],b=PR[f.ids[1]],c=PR[f.ids[2]];
+    const n=cross(sub(b,a),sub(c,a));const nl=Math.hypot(n[0],n[1],n[2])||1;
+    const lit=0.45+0.55*Math.abs(n[2]/nl);
+    x3.beginPath();
+    f.ids.forEach((id,i)=>{const q=proj3(PR[id]);const X=cx+q[0]*S,Y=cy-q[1]*S; i?x3.lineTo(X,Y):x3.moveTo(X,Y);});
+    x3.closePath();
+    const col=pal[oi%pal.length];
+    x3.fillStyle=hexA(col,0.32+0.4*lit);x3.fill();
+    if(traceEdges){x3.strokeStyle=hexA(YELLOW,0.9);x3.lineWidth=1.6;x3.stroke();}
+  });
+  // vertices
+  x3.fillStyle=PAPER;
+  PR.forEach(p=>{const q=proj3(p);x3.beginPath();x3.arc(cx+q[0]*S,cy-q[1]*S,2.4,0,7);x3.fill();});
+}
+function hexA(hex,a){
+  const n=parseInt(hex.slice(1),16);
+  return "rgba("+((n>>16)&255)+","+((n>>8)&255)+","+(n&255)+","+a.toFixed(3)+")";
+}
+
+/* ---------------- CELL 03 : whole tesseract rotating in 4-D + cut plane ---------------- */
+const c4=document.getElementById("c4d"), x4=c4.getContext("2d");
+const seen4d=document.getElementById("seen4d");
+const wcut4d=document.getElementById("wcut4d");
+// project 4-D -> 3-D (perspective from the w axis: the classic Schlegel inflation)
+function proj4to3(p){
+  const dist=3.2;
+  const k=dist/(dist - p[3]); // points with larger w bulge outward
+  return [p[0]*k,p[1]*k,p[2]*k];
+}
+function proj3to2(p,cx,cy,S){
+  const k=3.4/(3.4 - p[2]*0.4);
+  return [cx + p[0]*k*S, cy - p[1]*k*S, p[2]];
+}
+function draw4d(wCut){
+  const W=c4.width,H=c4.height,cx=W/2,cy=H/2,S=H*0.20;
+  x4.clearRect(0,0,W,H);
+  const V=tessNow();                        // SAME pose panel 02 slices
+  const V3=V.map(proj4to3);                 // tesseract vertices in 3-D
+  const V2=V3.map(p=>proj3to2(p,cx,cy,S));  // ...and on screen
+
+  // --- 1) THE CAGE: the whole tesseract, kept very faint (context, not hero) ---
+  for(const [a,b] of TESS.E){
+    const wa=V[a][3], wb=V[b][3];
+    const straddles=(wa-wCut)*(wb-wCut)<0;
+    const A=V2[a],B=V2[b];
+    x4.beginPath();x4.moveTo(A[0],A[1]);x4.lineTo(B[0],B[1]);
+    if(straddles){x4.strokeStyle="rgba(244,197,66,.32)";x4.lineWidth=1.2;} // hint of yellow on cut edges
+    else{x4.strokeStyle="rgba(58,160,196,.16)";x4.lineWidth=1;}            // ghostly cage
+    x4.stroke();
+  }
+  x4.fillStyle="rgba(243,237,225,.28)";
+  V2.forEach(p=>{x4.beginPath();x4.arc(p[0],p[1],1.8,0,7);x4.fill();});
+
+  // --- 2) THE SOLID: real cross-section, built as a true polyhedron (like panel 02) ---
+  // Build the section from the TRUE (un-inflated) coords so coplanar faces merge
+  // exactly as panel 02 does — identical face/vertex counts. Inflate only to draw.
+  const cutTrue=[]; // section vertices in true 3-D (x,y,z of the 4-D pose)
+  for(const [a,b] of TESS.E){
+    const wa=V[a][3], wb=V[b][3];
+    if((wa-wCut)*(wb-wCut)<0){
+      const t=(wCut-wa)/(wb-wa);
+      cutTrue.push([V[a][0]+t*(V[b][0]-V[a][0]),
+                    V[a][1]+t*(V[b][1]-V[a][1]),
+                    V[a][2]+t*(V[b][2]-V[a][2])]);
+    }
+  }
+  if(cutTrue.length<3){wcut4d.textContent="w = "+wCut.toFixed(2);seen4d.textContent="no section";return;}
+  const faces=hullFaces(cutTrue);           // SAME input space as panel 02 → same faces
+  const sname=namePoly(faces.length,cutTrue.length);
+  // screen positions: apply the Schlegel inflation only now, for drawing
+  const cutScr=cutTrue.map(p=>proj3to2(p,cx,cy,S));
+  // depth-sort faces back-to-front using true z
+  const fz=f=>{let z=0;f.ids.forEach(id=>z+=cutTrue[id][2]);return z/f.ids.length;};
+  const order=faces.slice().sort((a,b)=>fz(a)-fz(b));
+  const pal=[RED,ORANGE,YELLOW,CYAN];
+  order.forEach((f,oi)=>{
+    const a=cutTrue[f.ids[0]],b=cutTrue[f.ids[1]],c=cutTrue[f.ids[2]];
+    const n=cross(sub(b,a),sub(c,a));const nl=Math.hypot(n[0],n[1],n[2])||1;
+    const lit=0.45+0.55*Math.abs(n[2]/nl);
+    x4.beginPath();
+    f.ids.forEach((id,i)=>{const q=cutScr[id]; i?x4.lineTo(q[0],q[1]):x4.moveTo(q[0],q[1]);});
+    x4.closePath();
+    x4.fillStyle=hexA(pal[oi%pal.length],0.55+0.4*lit); // OPAQUE → reads in front of cage
+    x4.fill();
+    x4.strokeStyle=hexA(YELLOW,0.95);x4.lineWidth=1.6;x4.stroke();
+  });
+  // section vertices, bright
+  x4.fillStyle=YELLOW;
+  cutScr.forEach(q=>{x4.beginPath();x4.arc(q[0],q[1],3,0,7);x4.fill();});
+
+  wcut4d.textContent="w = "+wCut.toFixed(2);
+  seen4d.textContent=sname+" · "+faces.length+"f "+cutTrue.length+"v";
+}
+
+/* ---------------- drive both from one slider ---------------- */
+function render(){
+  const w=parseInt(slider.value,10)/100*1.05; // -1.05..1.05 covers full crossing
+  wval.textContent="w = "+w.toFixed(2);
+  draw2d(w);
+  draw3d(w);
+  draw4d(w);
+}
+slider.addEventListener("input",()=>{sweep=false;syncToggles();render();});
+
+document.getElementById("tEdges").addEventListener("click",e=>{traceEdges=!traceEdges;e.target.classList.toggle("on",traceEdges);render();});
+document.getElementById("tGhost").addEventListener("click",e=>{ghost=!ghost;e.target.classList.toggle("on",ghost);render();});
+const tSweep=document.getElementById("tSweep");
+tSweep.addEventListener("click",()=>{sweep=!sweep;syncToggles();});
+function syncToggles(){tSweep.classList.toggle("on",sweep);}
+
+// single animation loop: always spins the section; advances the slider when sweeping
+let dir=1;
+function frame(){
+  if(!reduce) spinA+=0.006;            // gentle continuous rotation for legibility
+  if(!reduce) spin4+=0.004;            // slow 4-D rotation of the whole tesseract
+  if(sweep){
+    let v=parseInt(slider.value,10)+dir*(reduce?3:1.3);
+    if(v>=100){v=100;dir=-1;} if(v<=-100){v=-100;dir=1;}
+    slider.value=v;
+  }
+  render();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
